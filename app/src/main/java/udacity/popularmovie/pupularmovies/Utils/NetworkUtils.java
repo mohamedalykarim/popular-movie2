@@ -9,6 +9,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+import udacity.popularmovie.pupularmovies.BuildConfig;
+
 /**
  * Created by Mohamed ALi on 4/6/2018.
  */
@@ -20,17 +22,13 @@ public class NetworkUtils {
     private static final String SEARCH_FORM = "search";
     private static final String DISCOVER_FORM = "discover";
     private static final String FIND_FORM = "find";
-
-    private static final String END_OF_URL = "movie";
-
+    private static final String MOVIE_FORM = "movie";
 
 
 
-
-    private static final String SORT_PARAM = "sort_by";
     private static final String API_PARAM = "api_key";
 
-    private static final String API_KEY = "[API_KEY]";
+    private static final String API_KEY = BuildConfig.API_KEY;
 
 
     /**
@@ -44,9 +42,8 @@ public class NetworkUtils {
         URL url = null;
         Uri movieUri = Uri.parse(BASE_MOVIE_URL)
                 .buildUpon()
-                .appendPath(DISCOVER_FORM)
-                .appendPath(END_OF_URL)
-                .appendQueryParameter(SORT_PARAM, sortType)
+                .appendPath(MOVIE_FORM)
+                .appendPath(sortType)
                 .appendQueryParameter(API_PARAM,API_KEY)
                 .build();
         try {

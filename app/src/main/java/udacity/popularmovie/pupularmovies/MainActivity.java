@@ -33,8 +33,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * (Most Popular sort and Top rated sort)
      */
     private static final String SORT_TYPE_EXTRA = "sort_ype";
-    private static final String MOST_POPULAR_MOVIE = "popularity.desc";
-    private static final String TOP_RATED_MOVIE = "vote_average.desc";
+    private static final String MOST_POPULAR_MOVIE = "popular";
+    private static final String TOP_RATED_MOVIE = "top_rated";
 
     /*
      * The Constant for loader id
@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         }else{
             offlineMode.setVisibility(View.VISIBLE);
+            topRatedRadio.setVisibility(View.INVISIBLE);
+            mostPopularRadio.setVisibility(View.INVISIBLE);
         }
 
 
@@ -149,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                  String json;
                  try {
+                     if (!isOnline()) return null;
                      json = NetworkUtils.getTheResponse(getURL(args.getString(SORT_TYPE_EXTRA)));
+
                  } catch (IOException e) {
                      e.printStackTrace();
                      return null;
@@ -179,6 +183,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+        if (data == null){
+            return;
+        }
 
         movies.addAll(MovieJSONUtils.getMovies(data));
         movieArrayAdapter.notifyDataSetChanged();
