@@ -26,7 +26,8 @@ import udacity.popularmovie.pupularmovies.Models.Movie;
 import udacity.popularmovie.pupularmovies.Utils.MovieJSONUtils;
 import udacity.popularmovie.pupularmovies.Utils.NetworkUtils;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> {
+public class MainActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<String> {
 
     /*
      * Constant that will use in the sort type of movies
@@ -70,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         final LoaderManager loaderManager = getSupportLoaderManager();
         Loader<String> loader = loaderManager.getLoader(LOADER_ID);
-
 
 
         // Check if the internet available
