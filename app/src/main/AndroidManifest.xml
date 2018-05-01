@@ -19,7 +19,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailsActivity"></activity>
+        <activity android:name=".DetailsActivity">
+
+        </activity>
+        
+        <provider
+            android:authorities="udacity.popularmovie.pupularmovies"
+            android:name="udacity.popularmovie.pupularmovies.Databases.FavoriteMoviesContentProvider"
+            android:exported="false"/>
+
     </application>
+
 
 </manifest>

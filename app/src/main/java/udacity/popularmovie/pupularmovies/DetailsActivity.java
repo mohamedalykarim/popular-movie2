@@ -1,7 +1,9 @@
 package udacity.popularmovie.pupularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
@@ -12,12 +14,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -26,11 +30,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import udacity.popularmovie.pupularmovies.Databases.FavoriteMovieContract;
+import udacity.popularmovie.pupularmovies.Databases.FavoriteMoviesContentProvider;
 import udacity.popularmovie.pupularmovies.Models.Movie;
 import udacity.popularmovie.pupularmovies.Models.Review;
 import udacity.popularmovie.pupularmovies.Models.Trailer;
+import udacity.popularmovie.pupularmovies.Utils.FavoriteMovieUtils;
 import udacity.popularmovie.pupularmovies.Utils.MovieJSONUtils;
 import udacity.popularmovie.pupularmovies.Utils.NetworkUtils;
+
+import static udacity.popularmovie.pupularmovies.Databases.FavoriteMovieContract.FMovies.CONTENT_URI;
 
 public class DetailsActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<List<String>> {
@@ -54,6 +63,8 @@ public class DetailsActivity extends AppCompatActivity
 
     LinearLayout trailerLinear, reviewLinear;
 
+    ImageView favoriteIMG;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,9 +82,74 @@ public class DetailsActivity extends AppCompatActivity
 
 
 
+
         // Receive the data
         recievedIntent = getIntent();
         movie = recievedIntent.getParcelableExtra(Intent.EXTRA_COMPONENT_NAME);
+
+
+        /**
+         * Handle Favorite Button
+         *
+         */
+        favoriteIMG = findViewById(R.id.favoriteImageView);
+
+
+        final boolean isChecked = FavoriteMovieUtils.isCheckedAsFavorite(
+                getApplicationContext(),
+                movie.getId()
+        );
+
+        if (isChecked){
+            favoriteIMG.setImageResource(R.drawable.favoriteon);
+        }else{
+            favoriteIMG.setImageResource(R.drawable.favoriteoff);
+
+        }
+
+
+        /**
+         * Handle Favorite Button Clicks
+         */
+
+        favoriteIMG.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (isChecked){
+
+                    FavoriteMovieUtils.deleteFavoriteMovie(
+                      getApplicationContext(),
+                      movie.getId()
+                    );
+
+                    favoriteIMG.setImageResource(R.drawable.favoriteoff);
+
+
+                }else{
+
+                    ContentValues values = new ContentValues();
+                    values.put(FavoriteMovieContract.FMovies.TITLE,movie.getOriginalTitle());
+                    values.put(FavoriteMovieContract.FMovies.MOVIE_ID,movie.getId());
+
+                    FavoriteMovieUtils.insertFavoriteMovie(
+                            getApplicationContext(),
+                            values
+                    );
+
+                    favoriteIMG.setImageResource(R.drawable.favoriteon);
+
+                }
+
+
+
+
+            }
+        });
+
+
+
+
 
         // Bind the data
         Picasso.with(this).load(movie.getPosterPath()).into(poster);
@@ -129,6 +205,7 @@ public class DetailsActivity extends AppCompatActivity
                 String movieID = args.getString(MOVIE_ID);
                 List<String> json = new ArrayList<>();
                 try {
+
                     json.add(NetworkUtils.getTheResponse(NetworkUtils.getTrailersURL(movieID)));
                     json.add(NetworkUtils.getTheResponse(NetworkUtils.getReviewsURL(movieID)));
                 } catch (IOException e) {
@@ -207,6 +284,7 @@ public class DetailsActivity extends AppCompatActivity
                     author.setText(reviews.get(i).getUsername());
                     content.setText(reviews.get(i).getReview());
 
+
                 }else if (trailerOrReviewList.get(0) instanceof Trailer){
                     TextView movieTitle = view.findViewById(R.id.movie_trailer_title);
                     final List<Trailer> trailers = (List<Trailer>) trailerOrReviewList;
@@ -227,9 +305,6 @@ public class DetailsActivity extends AppCompatActivity
             }
 
 
-            ViewGroup.MarginLayoutParams params
-                    = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
-            //params.setMargins(0,10,0,0);
 
             container.addView(view);
         }
@@ -241,4 +316,7 @@ public class DetailsActivity extends AppCompatActivity
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
+
+
+
 }
