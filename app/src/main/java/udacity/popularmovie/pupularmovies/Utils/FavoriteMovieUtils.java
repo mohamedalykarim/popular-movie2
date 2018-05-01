@@ -65,6 +65,26 @@ public class FavoriteMovieUtils {
 
     }
 
+    public static boolean isThereFavoriteMovies(Context context){
+        Cursor cursor = context.getContentResolver().query(
+                CONTENT_URI,
+                null,
+                null,
+                null,
+                null,
+                null);
+
+        cursor.moveToFirst();
+        if (cursor.getCount() > 0){
+            return true;
+        }else {
+            return false;
+        }
+
+
+
+    }
+
     public static List<Favorite> getALLFavoriteMovie(Context context){
         List<Favorite> favoriteMovies = new ArrayList<>();
         Cursor cursor = context.getContentResolver().query(
@@ -89,7 +109,14 @@ public class FavoriteMovieUtils {
         }
 
         cursor.close();
-        return favoriteMovies;
+
+        if (favoriteMovies.size() > 0){
+            return favoriteMovies;
+        }else
+        {
+            throw new NullPointerException("Null");
+        }
+
 
     }
 

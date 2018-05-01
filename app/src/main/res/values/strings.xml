@@ -9,4 +9,10 @@
     <string name="plot_synopsis">plot synopsis:</string>
     <string name="original_title">Original Title:</string>
     <string name="movie_poster">Movie Poster</string>
+    <string name="favorite_icon">Favorite icon</string>
+    <string name="favorite">Favorite</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews:</string>
+    <string name="review_icon">Review Icon</string>
+    <string name="trailer_icon">Trailer Icon</string>
 </resources>

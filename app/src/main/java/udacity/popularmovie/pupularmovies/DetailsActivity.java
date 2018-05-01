@@ -116,6 +116,12 @@ public class DetailsActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 
+                final boolean isChecked = FavoriteMovieUtils.isCheckedAsFavorite(
+                        getApplicationContext(),
+                        movie.getId()
+                );
+
+
                 if (isChecked){
 
                     FavoriteMovieUtils.deleteFavoriteMovie(
@@ -226,12 +232,8 @@ public class DetailsActivity extends AppCompatActivity
 
 
         /**
-         * The trailers and reviews shown in a list view
-         * by using adapters
-         *
-         * Using TrailerAdapter to populate trailers into
-         * the list view and ReviewAdapter to populate
-         * reviews into list view         *
+         * The trailers and reviews shown in a custom layout
+         * that added programmatically
          */
 
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -13,16 +14,21 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import udacity.popularmovie.pupularmovies.Adapters.FavoriteAdapter;
 import udacity.popularmovie.pupularmovies.Adapters.MovieArrayAdapter;
+import udacity.popularmovie.pupularmovies.Models.Favorite;
 import udacity.popularmovie.pupularmovies.Models.Movie;
+import udacity.popularmovie.pupularmovies.Utils.FavoriteMovieUtils;
 import udacity.popularmovie.pupularmovies.Utils.MovieJSONUtils;
 import udacity.popularmovie.pupularmovies.Utils.NetworkUtils;
 
@@ -44,10 +50,14 @@ public class MainActivity extends AppCompatActivity
 
 
     GridView grid;
+    ListView favoritesListView;
     MovieArrayAdapter movieArrayAdapter;
+    FavoriteAdapter favoriteAdapter;
     List<Movie> movies;
-    RadioButton topRatedRadio, mostPopularRadio;
+    List<Favorite> favorites;
+    RadioButton topRatedRadio, mostPopularRadio, favoriteRadio;
     RelativeLayout offlineMode;
+
 
 
 
@@ -57,8 +67,11 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         grid = findViewById(R.id.grid);
+        favoritesListView = findViewById(R.id.favorite_list_view);
+
         mostPopularRadio = findViewById(R.id.most_popular_rb);
         topRatedRadio = findViewById(R.id.top_rated_rb);
+        favoriteRadio = findViewById(R.id.favorite);
         offlineMode = findViewById(R.id.offline);
 
         /*
@@ -99,6 +112,10 @@ public class MainActivity extends AppCompatActivity
         topRatedRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                favoritesListView.setVisibility(View.GONE);
+                grid.setVisibility(View.VISIBLE);
+
+
                 loaderBundle.putString(SORT_TYPE_EXTRA, TOP_RATED_MOVIE);
                 getSupportLoaderManager().restartLoader(LOADER_ID,loaderBundle, MainActivity.this).forceLoad();
             }
@@ -107,10 +124,41 @@ public class MainActivity extends AppCompatActivity
         mostPopularRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                favoritesListView.setVisibility(View.GONE);
+                grid.setVisibility(View.VISIBLE);
+
                 loaderBundle.putString(SORT_TYPE_EXTRA, MOST_POPULAR_MOVIE);
                 getSupportLoaderManager().restartLoader(LOADER_ID,loaderBundle, MainActivity.this).forceLoad();
             }
         });
+
+        favoriteRadio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (favorites != null){
+                    favorites.clear();
+                }
+
+                favoritesListView.setVisibility(View.VISIBLE);
+                grid.setVisibility(View.GONE);
+
+                /**
+                 * Handle adapter
+                 *
+                 */
+
+                if (FavoriteMovieUtils.isThereFavoriteMovies(getApplicationContext())){
+                    favorites = FavoriteMovieUtils.getALLFavoriteMovie(getApplicationContext());
+                    favoriteAdapter = new FavoriteAdapter(getApplicationContext(),favorites);
+                    favoritesListView.setAdapter(favoriteAdapter);
+                    favoriteAdapter.notifyDataSetChanged();
+                }else{
+                    Toast.makeText(MainActivity.this, "There is no added favorites movies", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
 
 
 
