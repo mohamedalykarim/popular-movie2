@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity
      * The Constant for loader id
      */
     private static final int LOADER_ID = 13;
+    Bundle loaderBundle;
 
 
     GridView grid;
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity
 
 
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity
 
         mostPopularRadio = findViewById(R.id.most_popular_rb);
         topRatedRadio = findViewById(R.id.top_rated_rb);
+
         favoriteRadio = findViewById(R.id.favorite);
         offlineMode = findViewById(R.id.offline);
 
@@ -78,8 +82,17 @@ public class MainActivity extends AppCompatActivity
          * The default movie sort type.
          * You can change it to top rated by changing the next string inside the bundle
          */
-        final Bundle loaderBundle  = new Bundle();
-        loaderBundle.putString(SORT_TYPE_EXTRA, MOST_POPULAR_MOVIE);
+
+        loaderBundle = new Bundle();
+
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SORT_TYPE_EXTRA)){
+            loaderBundle.putString(SORT_TYPE_EXTRA, savedInstanceState.getString(SORT_TYPE_EXTRA));
+
+        }else{
+            loaderBundle.putString(SORT_TYPE_EXTRA, MOST_POPULAR_MOVIE);
+        }
+
 
 
         final LoaderManager loaderManager = getSupportLoaderManager();
@@ -109,28 +122,32 @@ public class MainActivity extends AppCompatActivity
          * handle the top rated and most popular radio buttons
          */
 
-        topRatedRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        topRatedRadio.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            public void onClick(View v) {
                 favoritesListView.setVisibility(View.GONE);
                 grid.setVisibility(View.VISIBLE);
 
-
+                loaderBundle.clear();
                 loaderBundle.putString(SORT_TYPE_EXTRA, TOP_RATED_MOVIE);
                 getSupportLoaderManager().restartLoader(LOADER_ID,loaderBundle, MainActivity.this).forceLoad();
+
             }
         });
 
-        mostPopularRadio.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        mostPopularRadio.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+            public void onClick(View v) {
                 favoritesListView.setVisibility(View.GONE);
                 grid.setVisibility(View.VISIBLE);
 
+                loaderBundle.clear();
                 loaderBundle.putString(SORT_TYPE_EXTRA, MOST_POPULAR_MOVIE);
                 getSupportLoaderManager().restartLoader(LOADER_ID,loaderBundle, MainActivity.this).forceLoad();
+
             }
         });
+
 
         favoriteRadio.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -257,5 +274,12 @@ public class MainActivity extends AppCompatActivity
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (loaderBundle.containsKey(SORT_TYPE_EXTRA)){
+            outState.putString(SORT_TYPE_EXTRA,loaderBundle.getString(SORT_TYPE_EXTRA));
+        }
 
+        super.onSaveInstanceState(outState);
+    }
 }
